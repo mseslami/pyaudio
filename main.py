@@ -40,10 +40,10 @@
 
 from pydub import AudioSegment
 
-# wav_audio = AudioSegment.from_file("aa.ogg")
-raw_audio = AudioSegment.from_file("aa.ogg")
-# wav_audio.export("audio1.mp3", format="mp3")
-raw_audio.export("audio2.mp3", format="mp3")
+# # wav_audio = AudioSegment.from_file("aa.ogg")
+# raw_audio = AudioSegment.from_file("aa.ogg")
+# # wav_audio.export("audio1.mp3", format="mp3")
+# raw_audio.export("audio2.mp3", format="mp3")
 
 import speech_recognition as sr
 

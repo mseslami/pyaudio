@@ -314,6 +314,8 @@
 import time
 from os import path
 from random import randint
+
+import numpy as np
 from requests import get
 from random import randint
 from time import sleep
@@ -321,6 +323,8 @@ from json import loads
 from os import path, mkdir
 
 import telepot
+
+from main import flac_To_Text
 
 token = '669710756:AAHJMMUNgF8atcnp1mrRNMck3-6u82kwvYI'
 TelegramBot = telepot.Bot(token)
@@ -350,43 +354,34 @@ def get_file(msg_list, chat_id):
     for msg in msg_list:
         print(msg)
         try:
-            oggid = msg['message']['voice']['file_id']
+            flacid = msg['message']['voice']['file_id']
         except KeyError:
             continue
 
-        try:
-            singer = msg['message']['voice']['performer']
-        except:
-            singer = 'Unknown'
+        song_name = msg["message"]["message_id"]
 
-        # Remove / and - characters to create directory
-        singer_dir = singer.replace('/', '-').strip()
-
-        try:
-            song_name = msg['message']['voice']['title']
-        except:
-            song_name = str(randint(120, 1900000000))
-
-        if path.exists('{}/{}_{}.ogg'.format(singer_dir, singer, song_name)):
-            print('{} {} --> File exists'.format(singer, song_name))
-            continue
-
-        print('Working on --> {} {}'.format(singer, song_name))
+        print('Working on --> {} message'.format(song_name))
         # Get file download path
-        download_url = get_file_path(token, oggid)
-        oggfile = get(download_url)
+        download_url = get_file_path(token, flacid)
+        flacfile = get(download_url)
+        print(flacfile.text)
 
-        if not path.exists(singer_dir):
-            mkdir(singer_dir)
+        # from scipy.io import wavfile
+        # # Convert `data` to 32 bit integers:
+        # y = (np.iinfo(np.int32).max * (data / np.abs(data).max())).astype(np.int32)
+        # wavfile.write("test.wav", fs, y)
 
-        try:
-            with open('{}/{}_{}.ogg'.format(singer_dir, singer, song_name), 'wb') as f:
-                f.write(oggfile.content)
-        except FileNotFoundError:
-            with open('{}.ogg'.format(randint(120, 1900000000)), 'wb') as f:
-                f.write(oggfile.content)
 
-        bot.sendMessage(chat_id, 'Done: {} {}'.format(singer, song_name))
+
+        # import wavio
+        # wavio.write("test.wav", data, fs, sampwidth=2)
+
+        with open('{}.flac'.format(song_name), 'wb') as f:
+            f.write(flacfile.content)
+
+        bot.sendMessage(chat_id, 'recognizeing the message: {}'.format(song_name))
+        bot.sendMessage(chat_id, flac_To_Text(str(song_name) + ".flac"))
+        # bot.sendMessage(chat_id,flac_To_Text("test.mp4"))
 
 
 def handle(msg):
